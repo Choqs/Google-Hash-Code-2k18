@@ -32,6 +32,8 @@ class Car:
     def attribute(self, index, l, step):
         self.travels.append(index)
         self.available_step = step + self.how_many_time(l)
+        self.x = l[2]
+        self.y = l[3]
 
 
 #----------------------------- PARSING -----------------------------
@@ -52,6 +54,10 @@ for i in range(nbv):
 
 #----------------------------- COMPUTE -----------------------------
 
+def is_paid(step, l, car):
+    return step + car.how_many_time(l) < l[5]
+    
+
 def distance(x1, y1, x2, y2):
     return (abs(x1 - x2) + abs(y1 - y2))
 
@@ -65,19 +71,32 @@ step = 0
 travel_list = [False] * len(matrix)
 while (not finish(travel_list)):
     for j in range(len(matrix)):
+        if (matrix[j][4] > step):
+            step += 1
+            continue
         if travel_list[j]:
             continue
         if (finish(travel_list)):
             break
         mini = 1000000000
         mini_index = 0
+        mini_not_paid = 1000000000
+        mini_index_not_paid = 0
         for i in range(len(res)):
             if (res[i].available_step <= step):
-                if (res[i].how_many_time(matrix[j]) < mini):
-                    mini = res[i].how_many_time(matrix[j])
-                    mini_index = i
+                if (is_paid(step, matrix[j], res[i])):
+                    if (res[i].how_many_time(matrix[j]) < mini):
+                        mini = res[i].how_many_time(matrix[j])
+                        mini_index = i
+                else:
+                    if (res[i].how_many_time(matrix[j]) < mini_not_paid):
+                        mini_not_paid = res[i].how_many_time(matrix[j])
+                        mini_index_not_paid = i
         if (mini != 1000000000):
-            res[mini_index].attribute(j + 1, matrix[j], step)
+            res[mini_index].attribute(j, matrix[j], step)
+            travel_list[j] = True
+        else:
+            res[mini_index_not_paid].attribute(j, matrix[j], step)
             travel_list[j] = True
         step += 1
 
@@ -88,7 +107,7 @@ while (not finish(travel_list)):
 result = open(argv[1][:-3] + ".out", 'w')
 r = ""
 for i in range(nbv): 
-    r += str(i + 1) + " "
+    r += str(len(res[i].travels)) + " "
     for j in range(len(res[i].travels)):
         r += str(res[i].travels[j]) + (" " if j < len(res[i].travels) - 1 else "")
     r += "\n"
