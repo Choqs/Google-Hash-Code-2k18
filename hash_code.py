@@ -42,11 +42,8 @@ l = data.split('\n')
 fl = l[0].split(' ')
 row, col, nbv, nbr, bns, steps = [ int(x) for x in fl ]
 matrix = []
-max_step = 0
 for i in range(nbr):
     matrix.append([int(x) for x in l[i + 1].split(' ')])
-    if (max_step < matrix[i][5]):
-        max_step = matrix[i][5]
     
 
 #----------------------------- INIT --------------------------------
@@ -72,7 +69,7 @@ def finish(travel_list):
 
 step = 0
 travel_list = [False] * len(matrix)
-while (not finish(travel_list) and step < max_step):
+while (not finish(travel_list)):
     for j in range(len(matrix)):
         if (matrix[j][4] > step):
             #step += 1
@@ -91,26 +88,17 @@ while (not finish(travel_list) and step < max_step):
                     if (res[i].how_many_time(matrix[j]) < mini):
                         mini = res[i].how_many_time(matrix[j])
                         mini_index = i
-                """
                 else:
                     if (res[i].how_many_time(matrix[j]) < mini_not_paid):
                         mini_not_paid = res[i].how_many_time(matrix[j])
                         mini_index_not_paid = i
-                """
         if (mini != 1000000000):
             res[mini_index].attribute(j, matrix[j], step)
             travel_list[j] = True
-        """
-        else:
+        elif (step > steps/2):
             res[mini_index_not_paid].attribute(j, matrix[j], step)
             travel_list[j] = True
-        """
     step += 1
-    
-for i in range(len(matrix)):
-    if (not travel_list[i]):
-        res[0].attribute(i, matrix[i], step)
-    
 
 
 
